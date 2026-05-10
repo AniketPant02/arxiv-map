@@ -1,6 +1,40 @@
 services:
+  hf-download:
+    image: python:3.11-slim
+    container_name: deepseek-r1-download
+    volumes:
+      - hf-cache:/root/.cache/huggingface
+    environment:
+      HF_HOME: /root/.cache/huggingface
+      HF_TOKEN: ${HF_TOKEN:-}
+      HUGGING_FACE_HUB_TOKEN: ${HF_TOKEN:-}
+      HF_HUB_DISABLE_XET: "1"
+    command:
+      - bash
+      - -lc
+      - |
+        set -euo pipefail
+
+        pip install -U "huggingface_hub[cli]" hf_transfer
+        export HF_HUB_ENABLE_HF_TRANSFER=1
+
+        echo "Downloading AWQ model..."
+        hf download casperhansen/deepseek-r1-distill-llama-8b-awq
+
+        echo "Downloading base tokenizer..."
+        hf download deepseek-ai/DeepSeek-R1-Distill-Llama-8B \
+          --include "tokenizer.json" \
+          --include "tokenizer_config.json" \
+          --include "special_tokens_map.json" \
+          --include "generation_config.json" \
+          --include "config.json"
+
+        echo "Done. Cache size:"
+        du -sh /root/.cache/huggingface || true
+        find /root/.cache/huggingface/hub -maxdepth 2 -type d | sort | tail -50
+
   vllm:
-    image: vllm/vllm-openai:latest
+    image: vllm/vllm-openai:v0.6.3.post1
     container_name: deepseek-r1-llama-8b-awq-vllm
     ipc: host
     gpus: all
@@ -15,11 +49,16 @@ services:
       HF_HOME: /root/.cache/huggingface
       HF_TOKEN: ${HF_TOKEN:-}
       HUGGING_FACE_HUB_TOKEN: ${HF_TOKEN:-}
+      HF_HUB_DISABLE_XET: "1"
       CUDA_VISIBLE_DEVICES: "0"
+      VLLM_ATTENTION_BACKEND: XFORMERS
+      CUDA_MODULE_LOADING: LAZY
 
     command:
       - --model
       - casperhansen/deepseek-r1-distill-llama-8b-awq
+      - --tokenizer
+      - deepseek-ai/DeepSeek-R1-Distill-Llama-8B
       - --served-model-name
       - deepseek-r1-llama-8b-awq
       - --quantization
@@ -27,13 +66,15 @@ services:
       - --dtype
       - half
       - --max-model-len
-      - "4096"
+      - "1024"
       - --max-num-seqs
       - "1"
       - --gpu-memory-utilization
-      - "0.82"
+      - "0.90"
       - --enforce-eager
       - --trust-remote-code
+      - --disable-log-requests
+      - --disable-frontend-multiprocessing
 
 volumes:
   hf-cache:
