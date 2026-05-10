@@ -1,0 +1,39 @@
+services:
+  vllm:
+    image: vllm/vllm-openai:latest
+    container_name: deepseek-r1-llama-8b-awq-vllm
+    ipc: host
+    gpus: all
+
+    ports:
+      - "8000:8000"
+
+    volumes:
+      - hf-cache:/root/.cache/huggingface
+
+    environment:
+      HF_HOME: /root/.cache/huggingface
+      HF_TOKEN: ${HF_TOKEN:-}
+      HUGGING_FACE_HUB_TOKEN: ${HF_TOKEN:-}
+      CUDA_VISIBLE_DEVICES: "0"
+
+    command:
+      - --model
+      - casperhansen/deepseek-r1-distill-llama-8b-awq
+      - --served-model-name
+      - deepseek-r1-llama-8b-awq
+      - --quantization
+      - awq
+      - --dtype
+      - half
+      - --max-model-len
+      - "4096"
+      - --max-num-seqs
+      - "1"
+      - --gpu-memory-utilization
+      - "0.82"
+      - --enforce-eager
+      - --trust-remote-code
+
+volumes:
+  hf-cache:
