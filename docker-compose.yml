@@ -5,7 +5,7 @@ services:
       - llm
     container_name: deepseek-r1-download
     volumes:
-      - hf-cache:/root/.cache/huggingface
+      - ./data/models:/root/.cache/huggingface
     environment:
       HF_HOME: /root/.cache/huggingface
       HF_TOKEN: ${HF_TOKEN:-}
@@ -13,7 +13,7 @@ services:
       HF_HUB_DISABLE_XET: "1"
     command:
       - bash
-      - -lc
+      - -lc 
       - |
         set -euo pipefail
 
@@ -45,7 +45,7 @@ services:
       - "8000:8000"
 
     volumes:
-      - hf-cache:/root/.cache/huggingface
+      - ./data/models:/root/.cache/huggingface
 
     environment:
       HF_HOME: /root/.cache/huggingface
@@ -114,6 +114,3 @@ services:
       - start-notebook.py
       - --ServerApp.token=${JUPYTER_TOKEN:-arxiv}
       - --ServerApp.password=
-
-volumes:
-  hf-cache:
