@@ -1,6 +1,8 @@
 services:
   hf-download:
     image: python:3.11-slim
+    profiles:
+      - llm
     container_name: deepseek-r1-download
     volumes:
       - hf-cache:/root/.cache/huggingface
@@ -75,6 +77,43 @@ services:
       - --trust-remote-code
       - --disable-log-requests
       - --disable-frontend-multiprocessing
+
+  db:
+    image: postgres:latest
+    profiles:
+      - dev
+      - prod
+    container_name: arxiv-postgres
+    environment:
+      POSTGRES_USER: arxiv
+      POSTGRES_PASSWORD: arxiv
+      POSTGRES_DB: arxiv
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data/postgresql:/var/lib/postgresql/data
+
+  notebook:
+    image: quay.io/jupyter/scipy-notebook:latest
+    container_name: arxiv-notebook
+    profiles:
+      - dev
+      - prod
+    depends_on:
+      - db
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./notebooks:/home/jovyan/work
+      - ./data:/home/jovyan/data
+    environment:
+      JUPYTER_ENABLE_LAB: "yes"
+      DATABASE_URL: postgresql://arxiv:arxiv@db:5432/arxiv
+      VLLM_BASE_URL: http://roti:8000/v1
+    command:
+      - start-notebook.py
+      - --ServerApp.token=${JUPYTER_TOKEN:-arxiv}
+      - --ServerApp.password=
 
 volumes:
   hf-cache:
