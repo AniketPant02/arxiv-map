@@ -32,7 +32,11 @@ class Normalizer:
 
     def affiliation(self, raw_affiliation: str | None) -> str | None:
         """Normalize a raw affiliation string."""
-        raise NotImplementedError
+        if not raw_affiliation:
+            return None
+        text = re.sub(r"\s+", " ", raw_affiliation).strip()
+        text = text.strip(",;.")
+        return text or None
 
     def text(self, raw_text: str | None) -> str | None:
         """Normalize free-form text fields."""
