@@ -110,6 +110,7 @@ services:
     ports:
       - "8888:8888"
     volumes:
+      - .:/home/jovyan/arxiv-map
       - ./notebooks:/home/jovyan/work
       - ./data:/home/jovyan/data
     environment:
@@ -117,6 +118,8 @@ services:
       DATABASE_URL: postgresql://arxiv:arxiv@db:5432/arxiv
       VLLM_BASE_URL: http://roti:8000/v1
     command:
-      - start-notebook.py
-      - --ServerApp.token=${JUPYTER_TOKEN:-arxiv}
-      - --ServerApp.password=
+      - bash
+      - -lc
+      - |
+        pip install -e /home/jovyan/arxiv-map
+        exec start-notebook.py --ServerApp.token=${JUPYTER_TOKEN:-arxiv} --ServerApp.password=

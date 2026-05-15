@@ -2,3 +2,8 @@
 notebooks/.ipynb_checkpoints/
 data/postgresql/
 data/raw
+
+__pycache__/
+venv/
+env/
+*.pyc
