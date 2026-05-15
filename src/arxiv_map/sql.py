@@ -11,7 +11,7 @@ class ArxivMapSQLClient:
     """Notebook-friendly SQL client for project upload workflows."""
 
     def __init__(self, database_url: str | None = None, engine: Engine | None = None) -> None:
-        self.database_url = database_url or os.environ.get("DATABASE_URL", DEFAULT_DATABASE_URL)
+        self.database_url = database_url or os.environ.get("DATABASE_URL", "NOT FOUND")
         self.engine = engine or create_engine(self.database_url)
 
     def upload_papers(self, paper_rows: list[dict[str, Any]]) -> None:
