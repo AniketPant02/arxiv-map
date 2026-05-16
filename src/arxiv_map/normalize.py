@@ -40,4 +40,7 @@ class Normalizer:
 
     def text(self, raw_text: str | None) -> str | None:
         """Normalize free-form text fields."""
-        raise NotImplementedError
+        if raw_text is None:
+            return None
+        text_value = " ".join(str(raw_text).split())
+        return text_value or None
