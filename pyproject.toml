@@ -9,6 +9,7 @@ description = "Python project for building a geospatial arXiv collaboration map"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+  "duckdb",
   "pandas",
   "psycopg2-binary",
   "sqlalchemy",

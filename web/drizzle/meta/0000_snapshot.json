@@ -1,0 +1,1206 @@
+{
+  "id": "00000000-0000-0000-0000-000000000000",
+  "prevId": "",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.spatial_ref_sys": {
+      "name": "spatial_ref_sys",
+      "schema": "",
+      "columns": {
+        "srid": {
+          "name": "srid",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "auth_name": {
+          "name": "auth_name",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "auth_srid": {
+          "name": "auth_srid",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "srtext": {
+          "name": "srtext",
+          "type": "varchar(2048)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "proj4text": {
+          "name": "proj4text",
+          "type": "varchar(2048)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "spatial_ref_sys_srid_check": {
+          "name": "spatial_ref_sys_srid_check",
+          "value": "(srid > 0) AND (srid <= 998999)"
+        }
+      },
+      "policies": {},
+      "isRLSEnabled": false
+    },
+    "public.schema_migrations": {
+      "name": "schema_migrations",
+      "schema": "",
+      "columns": {
+        "version": {
+          "name": "version",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "filename": {
+          "name": "filename",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "applied_at": {
+          "name": "applied_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false
+    },
+    "public.arxiv_papers": {
+      "name": "arxiv_papers",
+      "schema": "",
+      "columns": {
+        "arxiv_id": {
+          "name": "arxiv_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "abstract": {
+          "name": "abstract",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "doi": {
+          "name": "doi",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "journal_ref": {
+          "name": "journal_ref",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "primary_category": {
+          "name": "primary_category",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "categories": {
+          "name": "categories",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{\"\"}'"
+        },
+        "published_at": {
+          "name": "published_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "raw_metadata": {
+          "name": "raw_metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "idx_arxiv_papers_categories_gin": {
+          "name": "idx_arxiv_papers_categories_gin",
+          "columns": [
+            {
+              "expression": "categories",
+              "asc": true,
+              "nulls": "last",
+              "opclass": "array_ops",
+              "isExpression": false
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "gin",
+          "with": {}
+        },
+        "idx_arxiv_papers_primary_category": {
+          "name": "idx_arxiv_papers_primary_category",
+          "columns": [
+            {
+              "expression": "primary_category",
+              "asc": true,
+              "nulls": "last",
+              "opclass": "text_ops",
+              "isExpression": false
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false
+    },
+    "public.paper_authors": {
+      "name": "paper_authors",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "arxiv_id": {
+          "name": "arxiv_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "author_position": {
+          "name": "author_position",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "raw_name": {
+          "name": "raw_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "normalized_name": {
+          "name": "normalized_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "extraction_source": {
+          "name": "extraction_source",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "extraction_confidence": {
+          "name": "extraction_confidence",
+          "type": "numeric(4, 3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "idx_paper_authors_arxiv_id": {
+          "name": "idx_paper_authors_arxiv_id",
+          "columns": [
+            {
+              "expression": "arxiv_id",
+              "asc": true,
+              "nulls": "last",
+              "opclass": "text_ops",
+              "isExpression": false
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "paper_authors_arxiv_id_fkey": {
+          "name": "paper_authors_arxiv_id_fkey",
+          "tableFrom": "paper_authors",
+          "tableTo": "arxiv_papers",
+          "schemaTo": "public",
+          "columnsFrom": [
+            "arxiv_id"
+          ],
+          "columnsTo": [
+            "arxiv_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "paper_authors_arxiv_id_author_position_key": {
+          "columns": [
+            "arxiv_id",
+            "author_position"
+          ],
+          "nullsNotDistinct": false,
+          "name": "paper_authors_arxiv_id_author_position_key"
+        }
+      },
+      "checkConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false
+    },
+    "public.institutions": {
+      "name": "institutions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "institution_key": {
+          "name": "institution_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "display_name": {
+          "name": "display_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "raw_names": {
+          "name": "raw_names",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{\"\"}'"
+        },
+        "ror_id": {
+          "name": "ror_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "openalex_id": {
+          "name": "openalex_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "geocode_status": {
+          "name": "geocode_status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'pending'"
+        },
+        "geocode_query": {
+          "name": "geocode_query",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "geocode_source": {
+          "name": "geocode_source",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "geocode_raw": {
+          "name": "geocode_raw",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "country_code": {
+          "name": "country_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "country": {
+          "name": "country",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "region": {
+          "name": "region",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "city": {
+          "name": "city",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lat": {
+          "name": "lat",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lon": {
+          "name": "lon",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "geom": {
+          "name": "geom",
+          "type": "geometry(Point,4326)",
+          "primaryKey": false,
+          "notNull": false,
+          "generated": {
+            "as": "\nCASE\n    WHEN ((lat IS NOT NULL) AND (lon IS NOT NULL)) THEN st_setsrid(st_makepoint(lon, lat), 4326)\n    ELSE NULL::geometry\nEND",
+            "type": "stored"
+          }
+        },
+        "geocoded_at": {
+          "name": "geocoded_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "idx_institutions_country_code": {
+          "name": "idx_institutions_country_code",
+          "columns": [
+            {
+              "expression": "country_code",
+              "asc": true,
+              "nulls": "last",
+              "opclass": "text_ops",
+              "isExpression": false
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_institutions_geocode_status": {
+          "name": "idx_institutions_geocode_status",
+          "columns": [
+            {
+              "expression": "geocode_status",
+              "asc": true,
+              "nulls": "last",
+              "opclass": "text_ops",
+              "isExpression": false
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_institutions_geom": {
+          "name": "idx_institutions_geom",
+          "columns": [
+            {
+              "expression": "geom",
+              "asc": true,
+              "nulls": "last",
+              "opclass": "gist_geometry_ops_2d",
+              "isExpression": false
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "gist",
+          "where": "(geom IS NOT NULL)",
+          "with": {}
+        },
+        "idx_institutions_lat_lon": {
+          "name": "idx_institutions_lat_lon",
+          "columns": [
+            {
+              "expression": "lat",
+              "asc": true,
+              "nulls": "last",
+              "opclass": "float8_ops",
+              "isExpression": false
+            },
+            {
+              "expression": "lon",
+              "asc": true,
+              "nulls": "last",
+              "opclass": "float8_ops",
+              "isExpression": false
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "where": "((lat IS NOT NULL) AND (lon IS NOT NULL))",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "institutions_institution_key_key": {
+          "columns": [
+            "institution_key"
+          ],
+          "nullsNotDistinct": false,
+          "name": "institutions_institution_key_key"
+        }
+      },
+      "checkConstraints": {
+        "institutions_geocode_status_check": {
+          "name": "institutions_geocode_status_check",
+          "value": "geocode_status = ANY (ARRAY['pending'::text, 'resolved'::text, 'failed'::text, 'ambiguous'::text, 'skip'::text])"
+        },
+        "institutions_lat_check": {
+          "name": "institutions_lat_check",
+          "value": "(lat IS NULL) OR ((lat >= ('-90'::integer)::double precision) AND (lat <= (90)::double precision))"
+        },
+        "institutions_lon_check": {
+          "name": "institutions_lon_check",
+          "value": "(lon IS NULL) OR ((lon >= ('-180'::integer)::double precision) AND (lon <= (180)::double precision))"
+        },
+        "institutions_check": {
+          "name": "institutions_check",
+          "value": "((lat IS NULL) AND (lon IS NULL)) OR ((lat IS NOT NULL) AND (lon IS NOT NULL))"
+        }
+      },
+      "policies": {},
+      "isRLSEnabled": false
+    },
+    "public.paper_author_institutions": {
+      "name": "paper_author_institutions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "bigserial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "paper_author_id": {
+          "name": "paper_author_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "institution_id": {
+          "name": "institution_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "raw_affiliation": {
+          "name": "raw_affiliation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "affiliation_position": {
+          "name": "affiliation_position",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "extraction_source": {
+          "name": "extraction_source",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "extraction_confidence": {
+          "name": "extraction_confidence",
+          "type": "numeric(4, 3)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "idx_paper_author_institutions_author_id": {
+          "name": "idx_paper_author_institutions_author_id",
+          "columns": [
+            {
+              "expression": "paper_author_id",
+              "asc": true,
+              "nulls": "last",
+              "opclass": "int8_ops",
+              "isExpression": false
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_paper_author_institutions_institution_id": {
+          "name": "idx_paper_author_institutions_institution_id",
+          "columns": [
+            {
+              "expression": "institution_id",
+              "asc": true,
+              "nulls": "last",
+              "opclass": "int8_ops",
+              "isExpression": false
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "paper_author_institutions_paper_author_id_fkey": {
+          "name": "paper_author_institutions_paper_author_id_fkey",
+          "tableFrom": "paper_author_institutions",
+          "tableTo": "paper_authors",
+          "schemaTo": "public",
+          "columnsFrom": [
+            "paper_author_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "paper_author_institutions_institution_id_fkey": {
+          "name": "paper_author_institutions_institution_id_fkey",
+          "tableFrom": "paper_author_institutions",
+          "tableTo": "institutions",
+          "schemaTo": "public",
+          "columnsFrom": [
+            "institution_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "paper_author_institutions_paper_author_id_institution_id_key": {
+          "columns": [
+            "institution_id",
+            "paper_author_id"
+          ],
+          "nullsNotDistinct": false,
+          "name": "paper_author_institutions_paper_author_id_institution_id_key"
+        }
+      },
+      "checkConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false
+    },
+    "public.arxiv_paper_categories": {
+      "name": "arxiv_paper_categories",
+      "schema": "",
+      "columns": {
+        "arxiv_id": {
+          "name": "arxiv_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "category": {
+          "name": "category",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_primary": {
+          "name": "is_primary",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        }
+      },
+      "indexes": {
+        "idx_arxiv_paper_categories_category": {
+          "name": "idx_arxiv_paper_categories_category",
+          "columns": [
+            {
+              "expression": "category",
+              "asc": true,
+              "nulls": "last",
+              "opclass": "text_ops",
+              "isExpression": false
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "arxiv_paper_categories_arxiv_id_fkey": {
+          "name": "arxiv_paper_categories_arxiv_id_fkey",
+          "tableFrom": "arxiv_paper_categories",
+          "tableTo": "arxiv_papers",
+          "schemaTo": "public",
+          "columnsFrom": [
+            "arxiv_id"
+          ],
+          "columnsTo": [
+            "arxiv_id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "arxiv_paper_categories_pkey": {
+          "name": "arxiv_paper_categories_pkey",
+          "columns": [
+            "arxiv_id",
+            "category"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {},
+      "policies": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {
+    "public.geography_columns": {
+      "name": "geography_columns",
+      "schema": "public",
+      "columns": {
+        "f_table_catalog": {
+          "name": "f_table_catalog",
+          "type": "name",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "f_table_schema": {
+          "name": "f_table_schema",
+          "type": "name",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "f_table_name": {
+          "name": "f_table_name",
+          "type": "name",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "f_geography_column": {
+          "name": "f_geography_column",
+          "type": "name",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "coord_dimension": {
+          "name": "coord_dimension",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "srid": {
+          "name": "srid",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "isExisting": false,
+      "definition": "SELECT current_database() AS f_table_catalog, n.nspname AS f_table_schema, c.relname AS f_table_name, a.attname AS f_geography_column, postgis_typmod_dims(a.atttypmod) AS coord_dimension, postgis_typmod_srid(a.atttypmod) AS srid, postgis_typmod_type(a.atttypmod) AS type FROM pg_class c, pg_attribute a, pg_type t, pg_namespace n WHERE t.typname = 'geography'::name AND a.attisdropped = false AND a.atttypid = t.oid AND a.attrelid = c.oid AND c.relnamespace = n.oid AND (c.relkind = ANY (ARRAY['r'::\"char\", 'v'::\"char\", 'm'::\"char\", 'f'::\"char\", 'p'::\"char\"])) AND NOT pg_is_other_temp_schema(c.relnamespace) AND has_table_privilege(c.oid, 'SELECT'::text)",
+      "materialized": false
+    },
+    "public.geometry_columns": {
+      "name": "geometry_columns",
+      "schema": "public",
+      "columns": {
+        "f_table_catalog": {
+          "name": "f_table_catalog",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "f_table_schema": {
+          "name": "f_table_schema",
+          "type": "name",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "f_table_name": {
+          "name": "f_table_name",
+          "type": "name",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "f_geometry_column": {
+          "name": "f_geometry_column",
+          "type": "name",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "coord_dimension": {
+          "name": "coord_dimension",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "srid": {
+          "name": "srid",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "type": {
+          "name": "type",
+          "type": "varchar(30)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "isExisting": false,
+      "definition": "SELECT current_database()::character varying(256) AS f_table_catalog, n.nspname AS f_table_schema, c.relname AS f_table_name, a.attname AS f_geometry_column, COALESCE(postgis_typmod_dims(a.atttypmod), sn.ndims, 2) AS coord_dimension, COALESCE(NULLIF(postgis_typmod_srid(a.atttypmod), 0), sr.srid, 0) AS srid, replace(replace(COALESCE(NULLIF(upper(postgis_typmod_type(a.atttypmod)), 'GEOMETRY'::text), st.type, 'GEOMETRY'::text), 'ZM'::text, ''::text), 'Z'::text, ''::text)::character varying(30) AS type FROM pg_class c JOIN pg_attribute a ON a.attrelid = c.oid AND NOT a.attisdropped JOIN pg_namespace n ON c.relnamespace = n.oid JOIN pg_type t ON a.atttypid = t.oid LEFT JOIN ( SELECT s.connamespace, s.conrelid, s.conkey, (regexp_match(s.consrc, 'geometrytype\\(\\w+\\)\\s*=\\s*''(\\w+)'''::text, 'i'::text))[1] AS type FROM ( SELECT pg_constraint.connamespace, pg_constraint.conrelid, pg_constraint.conkey, pg_get_constraintdef(pg_constraint.oid) AS consrc FROM pg_constraint) s WHERE s.consrc ~* 'geometrytype\\(\\w+\\)\\s*=\\s*''\\w+'''::text) st ON st.connamespace = n.oid AND st.conrelid = c.oid AND (a.attnum = ANY (st.conkey)) LEFT JOIN ( SELECT s.connamespace, s.conrelid, s.conkey, (regexp_match(s.consrc, 'ndims\\(\\w+\\)\\s*=\\s*(\\d+)'::text, 'i'::text))[1]::integer AS ndims FROM ( SELECT pg_constraint.connamespace, pg_constraint.conrelid, pg_constraint.conkey, pg_get_constraintdef(pg_constraint.oid) AS consrc FROM pg_constraint) s WHERE s.consrc ~* 'ndims\\(\\w+\\)\\s*=\\s*\\d+'::text) sn ON sn.connamespace = n.oid AND sn.conrelid = c.oid AND (a.attnum = ANY (sn.conkey)) LEFT JOIN ( SELECT s.connamespace, s.conrelid, s.conkey, (regexp_match(s.consrc, 'srid\\(\\w+\\)\\s*=\\s*(\\d+)'::text, 'i'::text))[1]::integer AS srid FROM ( SELECT pg_constraint.connamespace, pg_constraint.conrelid, pg_constraint.conkey, pg_get_constraintdef(pg_constraint.oid) AS consrc FROM pg_constraint) s WHERE s.consrc ~* 'srid\\(\\w+\\)\\s*=\\s*\\d+'::text) sr ON sr.connamespace = n.oid AND sr.conrelid = c.oid AND (a.attnum = ANY (sr.conkey)) WHERE (c.relkind = ANY (ARRAY['r'::\"char\", 'v'::\"char\", 'm'::\"char\", 'f'::\"char\", 'p'::\"char\"])) AND NOT c.relname = 'raster_columns'::name AND t.typname = 'geometry'::name AND NOT pg_is_other_temp_schema(c.relnamespace) AND has_table_privilege(c.oid, 'SELECT'::text)",
+      "materialized": false
+    },
+    "public.core_arxiv_table": {
+      "name": "core_arxiv_table",
+      "schema": "public",
+      "columns": {
+        "arxiv_id": {
+          "name": "arxiv_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "abstract": {
+          "name": "abstract",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "doi": {
+          "name": "doi",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "journal_ref": {
+          "name": "journal_ref",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "primary_category": {
+          "name": "primary_category",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "categories": {
+          "name": "categories",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "published_at": {
+          "name": "published_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "raw_metadata": {
+          "name": "raw_metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "authors": {
+          "name": "authors",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "isExisting": false,
+      "definition": "SELECT arxiv_id, title, abstract, doi, journal_ref, primary_category, categories, published_at, updated_at, raw_metadata, COALESCE(( SELECT jsonb_agg(jsonb_build_object('author_id', a.id, 'position', a.author_position, 'raw_name', a.raw_name, 'normalized_name', a.normalized_name, 'institutions', COALESCE(( SELECT jsonb_agg(jsonb_build_object('institution_id', i.id, 'institution_key', i.institution_key, 'display_name', i.display_name, 'raw_affiliation', pai.raw_affiliation, 'city', i.city, 'region', i.region, 'country', i.country, 'country_code', i.country_code, 'lat', i.lat, 'lon', i.lon, 'geometry', CASE WHEN i.geom IS NOT NULL THEN st_asgeojson(i.geom)::jsonb ELSE NULL::jsonb END, 'geocode_status', i.geocode_status) ORDER BY pai.affiliation_position, i.display_name) AS jsonb_agg FROM paper_author_institutions pai JOIN institutions i ON i.id = pai.institution_id WHERE pai.paper_author_id = a.id), '[]'::jsonb)) ORDER BY a.author_position) AS jsonb_agg FROM paper_authors a WHERE a.arxiv_id = p.arxiv_id), '[]'::jsonb) AS authors FROM arxiv_papers p",
+      "materialized": false
+    },
+    "public.arxiv_network_nodes_by_category": {
+      "name": "arxiv_network_nodes_by_category",
+      "schema": "public",
+      "columns": {
+        "category": {
+          "name": "category",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "institution_id": {
+          "name": "institution_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "institution_key": {
+          "name": "institution_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "display_name": {
+          "name": "display_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "city": {
+          "name": "city",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "region": {
+          "name": "region",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "country": {
+          "name": "country",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "country_code": {
+          "name": "country_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lat": {
+          "name": "lat",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lon": {
+          "name": "lon",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "geom": {
+          "name": "geom",
+          "type": "geometry(Point,4326)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "geometry": {
+          "name": "geometry",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "paper_count": {
+          "name": "paper_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "isExisting": false,
+      "definition": "WITH paper_category_rows AS ( SELECT arxiv_paper_categories.arxiv_id, arxiv_paper_categories.category FROM arxiv_paper_categories UNION ALL SELECT arxiv_papers.arxiv_id, '__all__'::text AS category FROM arxiv_papers ), paper_institutions AS ( SELECT DISTINCT pcr.category, pcr.arxiv_id, pai.institution_id FROM paper_category_rows pcr JOIN paper_authors pa ON pa.arxiv_id = pcr.arxiv_id JOIN paper_author_institutions pai ON pai.paper_author_id = pa.id JOIN institutions i_1 ON i_1.id = pai.institution_id WHERE i_1.geocode_status = 'resolved'::text AND i_1.geom IS NOT NULL ) SELECT pi.category, i.id AS institution_id, i.institution_key, i.display_name, i.city, i.region, i.country, i.country_code, i.lat, i.lon, i.geom, st_asgeojson(i.geom)::jsonb AS geometry, count(DISTINCT pi.arxiv_id)::integer AS paper_count FROM paper_institutions pi JOIN institutions i ON i.id = pi.institution_id GROUP BY pi.category, i.id, i.institution_key, i.display_name, i.city, i.region, i.country, i.country_code, i.lat, i.lon, i.geom",
+      "materialized": true
+    },
+    "public.arxiv_network_edges_by_category": {
+      "name": "arxiv_network_edges_by_category",
+      "schema": "public",
+      "columns": {
+        "category": {
+          "name": "category",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "source_institution_id": {
+          "name": "source_institution_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "source_name": {
+          "name": "source_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "source_city": {
+          "name": "source_city",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "source_region": {
+          "name": "source_region",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "source_country": {
+          "name": "source_country",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "source_country_code": {
+          "name": "source_country_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "source_lat": {
+          "name": "source_lat",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "source_lon": {
+          "name": "source_lon",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "target_institution_id": {
+          "name": "target_institution_id",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "target_name": {
+          "name": "target_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "target_city": {
+          "name": "target_city",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "target_region": {
+          "name": "target_region",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "target_country": {
+          "name": "target_country",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "target_country_code": {
+          "name": "target_country_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "target_lat": {
+          "name": "target_lat",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "target_lon": {
+          "name": "target_lon",
+          "type": "double precision",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "geom": {
+          "name": "geom",
+          "type": "geometry",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "geometry": {
+          "name": "geometry",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "edge_weight": {
+          "name": "edge_weight",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "first_paper_at": {
+          "name": "first_paper_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "latest_paper_at": {
+          "name": "latest_paper_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sample_arxiv_ids": {
+          "name": "sample_arxiv_ids",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "isExisting": false,
+      "definition": "WITH paper_category_rows AS ( SELECT arxiv_paper_categories.arxiv_id, arxiv_paper_categories.category FROM arxiv_paper_categories UNION ALL SELECT arxiv_papers.arxiv_id, '__all__'::text AS category FROM arxiv_papers ), paper_institutions AS ( SELECT DISTINCT pcr.category, pcr.arxiv_id, p.published_at, pai.institution_id FROM paper_category_rows pcr JOIN arxiv_papers p ON p.arxiv_id = pcr.arxiv_id JOIN paper_authors pa ON pa.arxiv_id = pcr.arxiv_id JOIN paper_author_institutions pai ON pai.paper_author_id = pa.id JOIN institutions i ON i.id = pai.institution_id WHERE i.geocode_status = 'resolved'::text AND i.geom IS NOT NULL ), institution_pairs AS ( SELECT pi1.category, pi1.arxiv_id, pi1.published_at, pi1.institution_id AS source_institution_id, pi2.institution_id AS target_institution_id FROM paper_institutions pi1 JOIN paper_institutions pi2 ON pi1.category = pi2.category AND pi1.arxiv_id = pi2.arxiv_id AND pi1.institution_id < pi2.institution_id ) SELECT ip.category, ip.source_institution_id, source_i.display_name AS source_name, source_i.city AS source_city, source_i.region AS source_region, source_i.country AS source_country, source_i.country_code AS source_country_code, source_i.lat AS source_lat, source_i.lon AS source_lon, ip.target_institution_id, target_i.display_name AS target_name, target_i.city AS target_city, target_i.region AS target_region, target_i.country AS target_country, target_i.country_code AS target_country_code, target_i.lat AS target_lat, target_i.lon AS target_lon, st_makeline(source_i.geom, target_i.geom) AS geom, st_asgeojson(st_makeline(source_i.geom, target_i.geom))::jsonb AS geometry, count(DISTINCT ip.arxiv_id)::integer AS edge_weight, min(ip.published_at) AS first_paper_at, max(ip.published_at) AS latest_paper_at, array_agg(DISTINCT ip.arxiv_id ORDER BY ip.arxiv_id) AS sample_arxiv_ids FROM institution_pairs ip JOIN institutions source_i ON source_i.id = ip.source_institution_id JOIN institutions target_i ON target_i.id = ip.target_institution_id GROUP BY ip.category, ip.source_institution_id, source_i.display_name, source_i.city, source_i.region, source_i.country, source_i.country_code, source_i.lat, source_i.lon, source_i.geom, ip.target_institution_id, target_i.display_name, target_i.city, target_i.region, target_i.country, target_i.country_code, target_i.lat, target_i.lon, target_i.geom",
+      "materialized": true
+    }
+  },
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  },
+  "internal": {
+    "tables": {
+      "arxiv_papers": {
+        "columns": {
+          "categories": {
+            "isArray": true,
+            "dimensions": 1,
+            "rawType": "text"
+          }
+        }
+      },
+      "institutions": {
+        "columns": {
+          "raw_names": {
+            "isArray": true,
+            "dimensions": 1,
+            "rawType": "text"
+          }
+        }
+      },
+      "core_arxiv_table": {
+        "columns": {
+          "categories": {
+            "isArray": true,
+            "dimensions": 0,
+            "rawType": "text"
+          }
+        }
+      }
+    }
+  }
+}
